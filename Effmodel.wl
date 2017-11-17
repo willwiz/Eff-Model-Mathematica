@@ -286,7 +286,7 @@ $Q3$grad = Compile[{{c,_Real,1},{y,_Real,1}},
 (*The model responses are below*)
 
 
-rf$gamma = With[{cpOPTs = cpOPTs},
+(*rf$gamma = With[{cpOPTs = cpOPTs},
 	Compile[{{c,_Real,1}, {y,_Real,1}, {ymax,_Real,1}},
 		Module[{Q,Q1,Q2,Q3,exp},
 			Q = $Q[c[[2;;8]],y] - $Q[c[[2;;8]],ymax];
@@ -295,6 +295,17 @@ rf$gamma = With[{cpOPTs = cpOPTs},
 			Q3 = $Q3[c[[2;;8]],y];
 			exp = Exp[Q];
 			c[[1]]*{Total[Q1*exp], Total[Q2*exp], Total[Q3*exp]}
+	],cpOPTs]]*)
+	
+rf$gamma = With[{cpOPTs = cpOPTs},
+	Compile[{{c,_Real,1}, {y,_Real,1}, {ymax,_Real,1}},
+		Module[{Q,Q1,Q2,Q3,exp},
+			Q = $Q[c[[8;;14]],y] - $Q[c[[8;;14]],ymax];
+			Q1 = $Q1[c[[8;;14]],y];
+			Q2 = $Q2[c[[8;;14]],y];
+			Q3 = $Q3[c[[8;;14]],y];
+			exp = Exp[Q];
+			{Total[c[[1;;7]]*Q1*exp], Total[c[[1;;7]]*Q2*exp], Total[c[[1;;7]]*Q3*exp]}
 	],cpOPTs]]
 
 
@@ -340,8 +351,7 @@ strainenergy = With[{cpOPTs = cpOPTs},
 obj$W$gamma = With[{cpOPTs = cpOPTs},
 	Compile[{{c,_Real,1}, {ymax,_Real,1},{ydata,_Real,2},{Wdata,_Real,2}},
 		Module[{W,err,sse,size},
-			size = Length[ydata];
-			W = Table[rf$gamma[c,ydata[[i]],ymax],{i,size}];
+			W = Map[rf$gamma[c,#,ymax]&,ydata];
 			(*W = rf$gamma[c,ydata,ymax];*)
 			err = (W - Wdata);
 			Total[Total[err *err]]
