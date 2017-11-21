@@ -54,6 +54,13 @@ objW$c::usage::"the obj fun using the compile code"
 objW::usage::"the obj fun only partially using the compiled code"
 
 
+eps$W$y::usage::"Calculate the error^2 at one data point"
+
+grad::usage::"Calculate the gradient of the function at a point"
+
+jac$W$gamma::usage::"Calculates the jacobian of the obj function obj$W$gamma"
+
+
 (* ::Section:: *)
 (*Begin Function Definitions*)
 
@@ -63,10 +70,12 @@ Begin["`Private`"];
 
 rtOPTs = {"CatchMachineOverflow"->False, "CatchMachineUnderflow"->False,
 	"CatchMachineIntegerOverflow"->False, "CompareWithTolerance"->True,
-	"EvaluateSymbolically"->False,"RuntimeErrorHandler"->Evaluate,"WarningMessages"->True};
+	"EvaluateSymbolically"->False,"RuntimeErrorHandler"->Evaluate, 
+	"WarningMessages"->True};
 
 
-cpOPTs = {CompilationOptions->{"ExpressionOptimization"->True, "InlineExternalDefinitions"->True,"InlineCompiledFunctions"->True},
+cpOPTs = {CompilationOptions->{"ExpressionOptimization"->True, 
+	"InlineExternalDefinitions"->True,"InlineCompiledFunctions"->True},
 	RuntimeAttributes->{Listable}, 
 	Parallelization->True,
 	RuntimeOptions->rtOPTs};
@@ -293,9 +302,22 @@ $Q3$grad = Compile[{{c,_Real,1},{y,_Real,1}},
 			Q1 = $Q1[c[[2;;8]],y];
 			Q2 = $Q2[c[[2;;8]],y];
 			Q3 = $Q3[c[[2;;8]],y];
+			exp = Exp[Total[Q]];
+			c[[1]]*{Total[Q1]*exp, Total[Q2]*exp, Total[Q3]*exp}
+	],cpOPTs]]*)
+	
+
+(*rf$gamma = With[{cpOPTs = cpOPTs},
+	Compile[{{c,_Real,1}, {y,_Real,1}, {ymax,_Real,1}},
+		Module[{Q,Q1,Q2,Q3,exp},
+			Q = $Q[c[[2;;8]],y] - $Q[c[[2;;8]],ymax];
+			Q1 = $Q1[c[[2;;8]],y];
+			Q2 = $Q2[c[[2;;8]],y];
+			Q3 = $Q3[c[[2;;8]],y];
 			exp = Exp[Q];
 			c[[1]]*{Total[Q1*exp], Total[Q2*exp], Total[Q3*exp]}
 	],cpOPTs]]*)
+	
 	
 rf$gamma = With[{cpOPTs = cpOPTs},
 	Compile[{{c,_Real,1}, {y,_Real,1}, {ymax,_Real,1}},
@@ -354,20 +376,60 @@ obj$W$gamma = With[{cpOPTs = cpOPTs},
 			W = Map[rf$gamma[c,#,ymax]&,ydata];
 			(*W = rf$gamma[c,ydata,ymax];*)
 			err = (W - Wdata);
-			Total[Total[err *err]]
+			Total[Map[#.#&,Transpose[err]]]
 		]
 	,cpOPTs]]
 
 
-objW$c[c_?(VectorQ[#,NumericQ]&),ymax_?(VectorQ[#,NumericQ]&),ydata_?(ArrayQ[#,2,NumericQ]&),Wdata_?(ArrayQ[#,2,NumericQ]&)]:=
-	obj$W$gamma[c,ymax,ydata,Wdata]
+objW$c[c_?(VectorQ[#,NumericQ]&),ymax_?(VectorQ[#,NumericQ]&),
+	ydata_?(ArrayQ[#,2,NumericQ]&),Wdata_?(ArrayQ[#,2,NumericQ]&)]:=
+		obj$W$gamma[c,ymax,ydata,Wdata]
 
 
-objW[c_?(VectorQ[#,NumericQ]&),ymax_?(VectorQ[#,NumericQ]&),ydata_?(ArrayQ[#,2,NumericQ]&),Wdata_?(ArrayQ[#,2,NumericQ]&)]:=
-	Block[{W,err},
-		W = rf$gamma[c,ydata,ymax];
-		err = (W - Wdata);
-		Total[err *err,2]
+objW[c_?(VectorQ[#,NumericQ]&),ymax_?(VectorQ[#,NumericQ]&),
+	ydata_?(ArrayQ[#,2,NumericQ]&),Wdata_?(ArrayQ[#,2,NumericQ]&)]:=
+		Block[{W,err},
+			W = rf$gamma[c,ydata,ymax];
+			err = (W - Wdata);
+			Total[err *err,2]
+		]
+
+
+(* ::Subsection:: *)
+(*Calculating the covariance*)
+
+
+Needs["NumericalCalculus`"]
+
+
+c$eps$W$y = With[{cpOPTs = cpOPTs},
+	Compile[{{c,_Real,1}, {ymax,_Real,1},{ydata,_Real,1},{Wdata,_Real,1}},
+		Module[{W,err,sse,size},
+			err = (rf$gamma[c,ydata,ymax] - Wdata);
+			err.err
+		]
+	,cpOPTs]]
+	
+eps$W$y[c_?(VectorQ[#,NumericQ]&),ymax_?(VectorQ[#,NumericQ]&),
+	ydata_?(VectorQ[#,NumericQ]&),Wdata_?(VectorQ[#,NumericQ]&)]:=
+		c$eps$W$y[c,ymax,ydata,Wdata]
+
+
+SetAttributes[hold, HoldAll]
+
+hold[f_,r_]:=f/.r
+
+grad[optres_, ymax_, ydata_, Wdata_]:= 
+	Module[{n=Length[optres],x,par}, 
+		par=Table[x[j],{j,n}];
+		Table[ND[hold[eps$W$y[par, ymax, ydata, Wdata],Drop[Thread[par->optres],{j}]],
+			par[[j]], optres[[j]]],{j,Length[par]}]]
+
+
+jac$W$gamma[optres_, ymax_, ydata_, Wdata_]:=
+	Module[{m},
+		m = Length[ydata];
+		Table[grad[optres, ymax, ydata[[i]], Wdata[[i]]],{i,m}]
 	]
 
 
