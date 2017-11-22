@@ -22,7 +22,8 @@ Begin["`Private`"]
 opts$Plt3D = {BaseStyle->Directive[14,Black], AxesStyle->Directive[Black, 16],
 	PlotRange->All, BoxRatios->{1,1,1/GoldenRatio}, 
 	FaceGrids->{Back,Right,Bottom}, Boxed->False,ViewPoint->10*{-1,-1.5,.8},
-	Background->Transparent}
+	Background->None, Prolog->{{EdgeForm[],Texture[{{{0,0,0,0}}}],
+	Polygon[#,VertexTextureCoordinates->#]&[{{0,0},{1,0},{1,1}}]}}}
 
 opts$PPlt3D=Join[{PlotStyle->{Red,PointSize[Medium]}}, opts$Plt3D];
 
