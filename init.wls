@@ -1,10 +1,13 @@
 #!/usr/bin/env wolframscript
 (* ::Package:: *)
 
-Needs["Effmodel`"];
+Get["Effmodel`"];
 
 
-Block[{$ContextPath},Needs["Tools`"]]
+Block[{$ContextPath},Get["Tools`"]]
 
 
-Needs["plotting`"]
+Get["plotting`"]
+
+
+Needs["IPOPTLink`"]
