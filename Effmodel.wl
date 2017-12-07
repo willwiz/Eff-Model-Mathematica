@@ -224,95 +224,6 @@ $Q3 = Compile[{{c,_Real,1},{y,_Real,1}},
 (*No Shear component*)
 
 
-(*$Q = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y1q = y1s*y1s;
-			y2s = y[[2]]*y[[2]];
-			y2q = y2s*y2s;
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			{c[[1]]*y1s, c[[2]]*y2s, 2.0*c[[3]]*y[[1]]*y[[2]],0.5*c[[4]]*y1q, 0.5*c[[5]]*y2q, c[[6]]*y1s*y2s, 
-			2.0*c[[7]]*y[[1]]*y3s, 2.0*c[[8]]*y[[2]]*y3s}
-		],Evaluate@cpOPTs];
-		
-$Q1 = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			2.0*{c[[1]]*y[[1]], 0.0, c[[3]]*y[[2]],c[[4]]*y1s*y[[1]], 0.0, c[[6]]*y[[1]]*y2s,
-			c[[7]]*y3s, 0.0}
-		],Evaluate@cpOPTs];
-		
-$Q2 = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			2.0*{0.0, c[[2]]*y[[1]], c[[3]]*y[[1]], 0.0, c[[5]]*y2s*y[[2]], c[[6]]*y1s*y[[2]],
-			0.0, c[[8]]*y3s}
-		],Evaluate@cpOPTs];
-		
-$Q3 = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			4.0*c[[7]]*y[[1]]*y[[3]], 4.0*c[[8]]*y[[2]]*y[[3]]}
-		],Evaluate@cpOPTs];*)
-
-
-(*$Q = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y1q = y1s*y1s;
-			y2s = y[[2]]*y[[2]];
-			y2q = y2s*y2s;
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			{c[[1]]*y1s, c[[2]]*y2s, 2.0*c[[3]]*y[[1]]*y[[2]],0.5*c[[4]]*y1q, 
-			0.5*c[[5]]*y2q, c[[6]]*y1s*y2s, 
-			c[[7]]*y1s*y3s, c[[8]]*y2s*y3s, c[[9]]*y3q}
-		],Evaluate@cpOPTs];
-		
-$Q1 = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			2.0*{c[[1]]*y[[1]], 0.0, c[[3]]*y[[2]],c[[4]]*y1s*y[[1]], 0.0, 
-			c[[6]]*y[[1]]*y2s,
-			c[[7]]*y[[1]]*y3s, 0.0, 0.0}
-		],Evaluate@cpOPTs];
-		
-$Q2 = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			2.0*{0.0, c[[2]]*y[[1]], c[[3]]*y[[1]], 0.0, c[[5]]*y2s*y[[2]], 
-			c[[6]]*y1s*y[[2]],
-			0.0, c[[8]]*y[[2]]*y3s, 0.0}
-		],Evaluate@cpOPTs];
-		
-$Q3 = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			2.0*c[[7]]*y1s*y[[3]], 2.0*c[[8]]*y2s*y[[3]], 4.0*y3s*y[[3]]}
-		],Evaluate@cpOPTs];*)
-
-
 $Q = Compile[{{c,_Real,1},{y,_Real,1}},
 		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
 			y1s = y[[1]]*y[[1]];
@@ -321,9 +232,9 @@ $Q = Compile[{{c,_Real,1},{y,_Real,1}},
 			y2q = y2s*y2s;
 			y3s = y[[3]]*y[[3]];
 			y3q = y3s*y3s;
-			{c[[1]]*y1s, c[[2]]*y2s, 2.0*c[[3]]*y[[1]]*y[[2]],0.5*c[[4]]*y1q, 
-			0.5*c[[5]]*y2q, c[[6]]*y2s*y[[1]]*y[[2]], 
-			c[[7]]*y1s*y3s, c[[8]]*y2s*y3s, c[[9]]*y3q}
+			{c[[1]]*y1s, c[[2]]*y2s, 2.0*c[[3]]*y[[1]]*y[[2]], c[[4]]*y1q, 
+			c[[5]]*y2q, c[[6]]*y1s*y[[1]]*y[[2]], c[[7]]*y2s*y[[1]]*y[[2]], 
+			c[[8]]*y1s*y3s, c[[9]]*y2s*y3s, c[[10]]*y3q}
 		],Evaluate@cpOPTs];
 		
 $Q1 = Compile[{{c,_Real,1},{y,_Real,1}},
@@ -332,8 +243,9 @@ $Q1 = Compile[{{c,_Real,1},{y,_Real,1}},
 			y2s = y[[2]]*y[[2]];
 			y3s = y[[3]]*y[[3]];
 			y3q = y3s*y3s;
-			{2.0*c[[1]]*y[[1]], 0.0, 2.0*c[[3]]*y[[2]], 2.0*c[[4]]*y1s*y[[1]], 0.0, 
-			c[[6]]*y2s*y[[2]], 2.0*c[[7]]*y[[1]]*y3s, 0.0, 0.0}
+			{2.0*c[[1]]*y[[1]], 0.0, 2.0*c[[3]]*y[[2]], 4.0*c[[4]]*y1s*y[[1]], 
+			0.0, 3.0*c[[7]]*y1s*y[[2]], c[[8]]*y2s*y[[2]], 
+			2.0*c[[9]]*y[[1]]*y3s, 0.0, 0.0}
 		],Evaluate@cpOPTs];
 		
 $Q2 = Compile[{{c,_Real,1},{y,_Real,1}},
@@ -342,8 +254,9 @@ $Q2 = Compile[{{c,_Real,1},{y,_Real,1}},
 			y2s = y[[2]]*y[[2]];
 			y3s = y[[3]]*y[[3]];
 			y3q = y3s*y3s;
-			{0.0, 2.0*c[[2]]*y[[1]], 2.0*c[[3]]*y[[1]], 0.0, 2.0*c[[5]]*y2s*y[[2]], 
-			3.0*c[[6]]*y2s*y[[1]], 0.0, 2.0*c[[8]]*y[[2]]*y3s, 0.0}
+			{0.0, 2.0*c[[2]]*y[[2]], 2.0*c[[3]]*y[[1]], 0.0, 
+			4.0*c[[5]]*y2s*y[[2]], c[[6]]*y1s*y[[1]], 3.0*c[[7]]*y2s*y[[1]], 
+			0.0, 2.0*c[[9]]*y[[2]]*y3s, 0.0}
 		],Evaluate@cpOPTs];
 		
 $Q3 = Compile[{{c,_Real,1},{y,_Real,1}},
@@ -352,8 +265,9 @@ $Q3 = Compile[{{c,_Real,1},{y,_Real,1}},
 			y2s = y[[2]]*y[[2]];
 			y3s = y[[3]]*y[[3]];
 			y3q = y3s*y3s;
-			{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			2.0*c[[7]]*y1s*y[[3]], 2.0*c[[8]]*y2s*y[[3]], 4.0*c[[9]]*y3s*y[[3]]}
+			{0.0, 0.0, 0.0, 0.0, 
+			0.0, 0.0, 0.0, 
+			2.0*c[[8]]*y1s*y[[3]], 2.0*c[[9]]*y2s*y[[3]], 4.0*c[[10]]*y3s*y[[3]]}
 		],Evaluate@cpOPTs];
 
 
@@ -363,39 +277,53 @@ $Q3 = Compile[{{c,_Real,1},{y,_Real,1}},
 
 $Q$grad = With[{cpOPTs = cpOPTs},
 	Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y3s},
+		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
 			y1s = y[[1]]*y[[1]];
+			y1q = y1s*y1s;
 			y2s = y[[2]]*y[[2]];
+			y2q = y2s*y2s;
 			y3s = y[[3]]*y[[3]];
-			{y1s, y2s, y3s, y1s*y2s, y1s*y3s, y2s*y3s, y1s*y2s*y3s}
-		]
-		,cpOPTs]]
+			y3q = y3s*y3s;
+			{0.0, y1s, y2s, 2.0*y[[1]]*y[[2]], y1q, 
+			y2q, y1s*y[[1]]*y[[2]], y2s*y[[1]]*y[[2]], 
+			y1s*y3s, y2s*y3s, y3q}
+		],cpOPTs]]
 		
 $Q1$grad = With[{cpOPTs = cpOPTs},
 	Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y3s},
+		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
 			y1s = y[[1]]*y[[1]];
 			y2s = y[[2]]*y[[2]];
 			y3s = y[[3]]*y[[3]];
-			2.0*{y[[1]], 0.0, 0.0, y[[1]]*y2s, y[[1]]*y3s, 0.0, y[[1]]*y2s*y3s}
-		], cpOPTs]];
+			y3q = y3s*y3s;
+			{0.0, 2.0*y[[1]], 0.0, 2.0*y[[2]], 4.0*y1s*y[[1]], 
+			0.0, 3.0*y1s*y[[2]], y2s*y[[2]], 
+			2.0*y[[1]]*y3s, 0.0, 0.0}
+		],cpOPTs]];
 		
 $Q2$grad = With[{cpOPTs = cpOPTs},
 	Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y3s},
+		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
 			y1s = y[[1]]*y[[1]];
 			y2s = y[[2]]*y[[2]];
 			y3s = y[[3]]*y[[3]];
-			2.0*{0.0, y[[2]], 0.0, y1s*y[[2]], 0.0, y[[2]]*y3s, y1s*y[[2]]*y3s}
-		], cpOPTs]];
+			y3q = y3s*y3s;
+			{0.0, 0.0, 2.0*y[[2]], 2.0*y[[1]], 0.0, 
+			4.0*y2s*y[[2]], y1s*y[[1]], 3.0*y2s*y[[1]], 
+			0.0, 2.0*y[[2]]*y3s, 0.0}
+		],cpOPTs]];
 		
-$Q3$grad = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y3s},
+$Q3$grad = With[{cpOPTs = cpOPTs},
+	Compile[{{c,_Real,1},{y,_Real,1}},
+		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
 			y1s = y[[1]]*y[[1]];
 			y2s = y[[2]]*y[[2]];
 			y3s = y[[3]]*y[[3]];
-			2.0*{0.0, 0.0, y[[3]], 0.0, y1s*y[[3]], y2s*y[[3]], y1s*y2s*y[[3]]}
-		],Evaluate@cpOPTs];
+			y3q = y3s*y3s;
+			{0.0, 0.0, 0.0, 0.0, 0.0, 
+			0.0, 0.0, 0.0, 
+			2.0*y1s*y[[3]], 2.0*y2s*y[[3]], 4.0*y3s*y[[3]]}
+		],cpOPTs]];
 
 
 (* ::Section:: *)
@@ -404,7 +332,7 @@ $Q3$grad = Compile[{{c,_Real,1},{y,_Real,1}},
 
 rf$gamma = With[{cpOPTs = cpOPTs},
 	Compile[{{c,_Real,1}, {y,_Real,1}, {ymax,_Real,1}},
-		Module[{Q,Q1,Q2,Q3,exp, $c=c[[2;;10]]},
+		Module[{Q,Q1,Q2,Q3,exp, $c=c[[2;;11]]},
 			Q = $Q[$c,y] - $Q[$c,ymax];
 			Q1 = $Q1[$c,y];
 			Q2 = $Q2[$c,y];
@@ -436,6 +364,22 @@ rf$gamma = With[{cpOPTs = cpOPTs},
 			exp = Exp[Q];
 			{Total[c[[1;;8]]*Q1*exp], Total[c[[1;;8]]*Q2*exp], Total[c[[1;;8]]*Q3*exp]}
 	],cpOPTs]]*)
+
+
+(* ::Subsection:: *)
+(*Jacobian*)
+
+
+jac$gamma = With[{cpOPTs = cpOPTs},
+	Compile[{{c,_Real,1}, {y,_Real,1}, {ymax,_Real,1}},
+		Module[{Q,Q1,Q2,Q3,exp, $c=c[[2;;11]]},
+			Q = $Q[$c,y] - $Q[$c,ymax];
+			Q1 = $Q1[$c,y];
+			Q2 = $Q2[$c,y];
+			Q3 = $Q3[$c,y];
+			exp = Exp[Total[Q]];
+			c[[1]]*{Total[Q1]*exp, Total[Q2]*exp, Total[Q3]*exp}
+	],cpOPTs]]
 
 
 (*rf$grad = With[{cpOPTs = cpOPTs},
