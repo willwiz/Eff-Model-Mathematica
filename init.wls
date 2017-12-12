@@ -11,3 +11,6 @@ Get["plotting`"]
 
 
 Needs["IPOPTLink`"]
+
+
+Needs["CompiledFunctionTools`"]

@@ -3,62 +3,80 @@
 BeginPackage["Effmodel`"]
 
 
-toTensor2D::usage::"Takes a flattened vector to a square array"
+toTensor2D::usage::"Takes a flattened vector to a square array";
 
-cross2D::usage::"The 2D cross product used to find the orthogonal vector"
+cross2D::usage::"The 2D cross product used to find the orthogonal vector";
 
-dot2D::usage::"The 2D dot product used to find the vector"
+dot2D::usage::"The 2D dot product used to find the vector";
 
-mult2D::usage::"matrix multiplication between 2 matrix in vector form"
+mult2D::usage::"matrix multiplication between 2 matrix in vector form";
 
-trp2D::usage::"matrix transpose in vector form"
+trp2D::usage::"matrix transpose in vector form";
 
-calc$m::usage::"Finds the new unit vector direction of M"
+calc$m::usage::"Finds the new unit vector direction of M";
 
-calc$s::usage::"Finds the new unit vector direction orthogonal of M"
-
-
-lambda$M::usage::"compute the stretch along M"
-
-lambda$S::usage::"compute the stretch along S"
-
-phi::usage::"computes the shear angle"
-
-gamma$1::usage::"compute the invariant"
-
-gamma$2::usage::"compute the invariant"
-
-gamma$3::usage::"compute the invariant"
+calc$s::usage::"Finds the new unit vector direction orthogonal of M";
 
 
-W1$fromdata::usage::"computes the first response function from some given data"
+lambda$M::usage::"compute the stretch along M";
 
-W2$fromdata::usage::"computes the second response function from some given data"
+lambda$S::usage::"compute the stretch along S";
 
-W3$fromdata::usage::"computes the third response function from some given data"
+phi::usage::"computes the shear angle";
 
+gamma$1::usage::"compute the invariant";
 
-rf$gamma::usage::"the response function as a function of gamma"
+gamma$2::usage::"compute the invariant";
 
-responsefunctions::usage::"computes the response functions and puts them in an array"
-
-se$gamma::usage::"The strain energy as a function of gamma"
-
-strainenergy::usage::"computes the strain energy given the parameters, and strain"
+gamma$3::usage::"compute the invariant";
 
 
-obj$W$gamma::usage::"compiled code for the objective function as a function of gamma"
+$Qp;
+$Q1p;
+$Q2p;
+$Q3p;
 
-objW$c::usage::"the obj fun using the compile code"
 
-objW::usage::"the obj fun only partially using the compiled code"
+W1$fromdata::usage::"computes the first response function from some given data";
+
+W2$fromdata::usage::"computes the second response function from some given data";
+
+W3$fromdata::usage::"computes the third response function from some given data";
 
 
-eps$W$y::usage::"Calculate the error^2 at one data point"
+rf$gamma::usage::"the response function as a function of gamma";
 
-grad::usage::"Calculate the gradient of the function at a point"
+responsefunctions::usage::"computes the response functions and puts them in an array";
 
-jac$W$gamma::usage::"Calculates the jacobian of the obj function obj$W$gamma"
+se$gamma::usage::"The strain energy as a function of gamma";
+
+strainenergy::usage::"computes the strain energy given the parameters, and strain";
+
+
+obj$W$gamma::usage::"compiled code for the objective function as a function of gamma";
+
+objW$c::usage::"the obj fun using the compile code";
+
+obj$grad$W::usage::"the gradient of the obj fun using the compile code";
+
+grad$W$c::usage::"the gradient of the obj fun using the compile code";
+
+objW::usage::"the obj fun only partially using the compiled code";
+
+
+eps$W$y::usage::"Calculate the error^2 at one data point";
+
+rf$grad1::usage::"Calculate the gradient of the function at a point";
+rf$grad2::usage::"Calculate the gradient of the function at a point";
+rf$grad3::usage::"Calculate the gradient of the function at a point";
+
+grad::usage::"Calculate the gradient of the function at a point";
+
+grad$W$gamma::usage::"Calculates the gradient of the obj function obj$W$gamma at one point";
+
+jac$W$gamma::usage::"Calculates the jacobian of the obj function obj$W$gamma";
+
+cjac$W$gamma::usage::"Calculates the jacobian of the obj function obj$W$gamma using the analytical solution";
 
 
 (* ::Section:: *)
@@ -168,162 +186,45 @@ $gamma = Compile[{{F,_Real,1},{M,_Real,1}},
 (*This defines Q and its derivatives*)
 
 
-(* ::Subsubsection::Closed:: *)
-(*Traditional form*)
-
-
-(*$Q = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y3s,y3c},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3c = y3s*y[[3]];
-			y3q = y3s*y3s;
-			{c[[1]]*y1s, c[[2]]*y2s, c[[3]]*y3s,
-				c[[4]]*y[[1]]*y[[2]], c[[5]]*y[[1]]*y3s,
-				c[[6]]*y[[2]]*y3s, c[[7]]*y[[1]]*y[[2]]*y3s
-				}
-		],Evaluate@cpOPTs];
-		
-$Q1 = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y3s,y3c},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3c = y3s*y[[3]];
-			{2.0*c[[1]]*y[[1]], 0.0, 0.0,
-				c[[4]]*y[[2]], c[[5]]*y3s,
-				0.0, c[[7]]*y[[2]]*y3s
-				}
-		],Evaluate@cpOPTs];
-		
-$Q2 = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y3s,y3c},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			{0.0, 2.0*c[[2]]*y[[2]], 0.0,
-				c[[4]]*y[[1]], 0.0,
-				c[[6]]*y3s, c[[7]]*y[[1]]*y3s
-				}
-		],Evaluate@cpOPTs];
-		
-$Q3 = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y3s},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			2.0*{0.0, 0.0, c[[3]]*y[[3]],
-				0.0, c[[5]]*y[[1]]*y[[3]],
-				c[[6]]*y[[2]]*y[[3]], c[[7]]*y[[1]]*y[[2]]*y[[3]]
-				}
-		],Evaluate@cpOPTs];*)
-
-
 (* ::Subsubsection:: *)
 (*No Shear component*)
 
 
-$Q = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y1q = y1s*y1s;
-			y2s = y[[2]]*y[[2]];
-			y2q = y2s*y2s;
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			{c[[1]]*y1s, c[[2]]*y2s, 2.0*c[[3]]*y[[1]]*y[[2]], c[[4]]*y1q, 
-			c[[5]]*y2q, c[[6]]*y1s*y[[1]]*y[[2]], c[[7]]*y2s*y[[1]]*y[[2]], 
-			c[[8]]*y1s*y3s, c[[9]]*y2s*y3s, c[[10]]*y3q}
-		],Evaluate@cpOPTs];
+$Qp = With[{cpOPTs = cpOPTs},
+	Compile[{{y,_Real,1},{ys,_Real,1}},
+		Module[{},
+			{0.0, ys[[1]], ys[[2]], 2.0*y[[1]]*y[[2]], 
+			ys[[1]]*ys[[1]], ys[[2]]*ys[[2]], ys[[1]]*y[[1]]*y[[2]], ys[[2]]*y[[1]]*y[[2]], 
+			ys[[1]]*ys[[3]], ys[[2]]*ys[[3]], ys[[3]]*ys[[3]]}
+		],cpOPTs]];
 		
-$Q1 = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			{2.0*c[[1]]*y[[1]], 0.0, 2.0*c[[3]]*y[[2]], 4.0*c[[4]]*y1s*y[[1]], 
-			0.0, 3.0*c[[7]]*y1s*y[[2]], c[[8]]*y2s*y[[2]], 
-			2.0*c[[9]]*y[[1]]*y3s, 0.0, 0.0}
-		],Evaluate@cpOPTs];
+$Q1p = With[{cpOPTs = cpOPTs},
+	Compile[{{y,_Real,1},{ys,_Real,1}},
+		Module[{},
+			{0.0, 2.0*y[[1]], 0.0, 2.0*y[[2]], 
+			4.0*y[[1]]*ys[[1]], 0.0, 3.0*ys[[1]]*y[[2]], ys[[2]]*y[[2]], 
+			2.0*y[[1]]*ys[[3]], 0.0, 0.0}
+		],cpOPTs]];
 		
-$Q2 = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			{0.0, 2.0*c[[2]]*y[[2]], 2.0*c[[3]]*y[[1]], 0.0, 
-			4.0*c[[5]]*y2s*y[[2]], c[[6]]*y1s*y[[1]], 3.0*c[[7]]*y2s*y[[1]], 
-			0.0, 2.0*c[[9]]*y[[2]]*y3s, 0.0}
-		],Evaluate@cpOPTs];
+$Q2p = With[{cpOPTs = cpOPTs},
+	Compile[{{y,_Real,1},{ys,_Real,1}},
+		Module[{},
+			{0.0, 0.0, 2.0*y[[2]], 2.0*y[[1]], 
+			0.0, 4.0*y[[2]]*ys[[2]], ys[[1]]*y[[1]], 3.0*ys[[2]]*y[[1]], 
+			0.0, 2.0*y[[2]]*ys[[3]], 0.0}
+		],cpOPTs]];
 		
-$Q3 = Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
+$Q3p = With[{cpOPTs = cpOPTs},
+	Compile[{{y,_Real,1},{ys,_Real,1}},
+		Module[{},
 			{0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 
-			2.0*c[[8]]*y1s*y[[3]], 2.0*c[[9]]*y2s*y[[3]], 4.0*c[[10]]*y3s*y[[3]]}
-		],Evaluate@cpOPTs];
+			0.0, 0.0, 0.0, 0.0, 
+			2.0*ys[[1]]*y[[3]], 2.0*ys[[2]]*y[[3]], 4.0*y[[3]]*ys[[3]]}
+		],cpOPTs]];
 
 
 (* ::Subsubsection:: *)
 (*This defines the jacobians*)
-
-
-$Q$grad = With[{cpOPTs = cpOPTs},
-	Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y1q = y1s*y1s;
-			y2s = y[[2]]*y[[2]];
-			y2q = y2s*y2s;
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			{0.0, y1s, y2s, 2.0*y[[1]]*y[[2]], y1q, 
-			y2q, y1s*y[[1]]*y[[2]], y2s*y[[1]]*y[[2]], 
-			y1s*y3s, y2s*y3s, y3q}
-		],cpOPTs]]
-		
-$Q1$grad = With[{cpOPTs = cpOPTs},
-	Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			{0.0, 2.0*y[[1]], 0.0, 2.0*y[[2]], 4.0*y1s*y[[1]], 
-			0.0, 3.0*y1s*y[[2]], y2s*y[[2]], 
-			2.0*y[[1]]*y3s, 0.0, 0.0}
-		],cpOPTs]];
-		
-$Q2$grad = With[{cpOPTs = cpOPTs},
-	Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			{0.0, 0.0, 2.0*y[[2]], 2.0*y[[1]], 0.0, 
-			4.0*y2s*y[[2]], y1s*y[[1]], 3.0*y2s*y[[1]], 
-			0.0, 2.0*y[[2]]*y3s, 0.0}
-		],cpOPTs]];
-		
-$Q3$grad = With[{cpOPTs = cpOPTs},
-	Compile[{{c,_Real,1},{y,_Real,1}},
-		Module[{y1s,y2s,y1q,y2q,y3s,y3q},
-			y1s = y[[1]]*y[[1]];
-			y2s = y[[2]]*y[[2]];
-			y3s = y[[3]]*y[[3]];
-			y3q = y3s*y3s;
-			{0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 
-			2.0*y1s*y[[3]], 2.0*y2s*y[[3]], 4.0*y3s*y[[3]]}
-		],cpOPTs]];
 
 
 (* ::Section:: *)
@@ -332,62 +233,62 @@ $Q3$grad = With[{cpOPTs = cpOPTs},
 
 rf$gamma = With[{cpOPTs = cpOPTs},
 	Compile[{{c,_Real,1}, {y,_Real,1}, {ymax,_Real,1}},
-		Module[{Q,Q1,Q2,Q3,exp, $c=c[[2;;11]]},
-			Q = $Q[$c,y] - $Q[$c,ymax];
-			Q1 = $Q1[$c,y];
-			Q2 = $Q2[$c,y];
-			Q3 = $Q3[$c,y];
-			exp = Exp[Total[Q]];
-			c[[1]]*{Total[Q1]*exp, Total[Q2]*exp, Total[Q3]*exp}
-	],cpOPTs]]
-	
+		Module[{Q,Q1,Q2,Q3,exp},
+			With[{ys = y*y, ymaxs = ymax*ymax},
+			Q = Total[c*($Qp[y,ys] - $Qp[ymax, ymaxs])];
+			Q1 = Total[c*$Q1p[y,ys]];
+			Q2 = Total[c*$Q2p[y,ys]];
+			Q3 = Total[c*$Q3p[y,ys]];];
+			exp = Exp[Q];
+			c[[1]]*{Q1*exp, Q2*exp, Q3*exp}]
+	,{{$Qp,_Real,1}}
+	,cpOPTs]];
 
-(*rf$gamma = With[{cpOPTs = cpOPTs},
+
+rf$grad1 = With[{cpOPTs = cpOPTs},
 	Compile[{{c,_Real,1}, {y,_Real,1}, {ymax,_Real,1}},
-		Module[{Q,Q1,Q2,Q3,exp},
-			Q = $Q[c[[2;;8]],y] - $Q[c[[2;;8]],ymax];
-			Q1 = $Q1[c[[2;;8]],y];
-			Q2 = $Q2[c[[2;;8]],y];
-			Q3 = $Q3[c[[2;;8]],y];
-			exp = Exp[Q];
-			c[[1]]*{Total[Q1*exp], Total[Q2*exp], Total[Q3*exp]}
-	],cpOPTs]]*)
-	
-	
-(*rf$gamma = With[{cpOPTs = cpOPTs},
+		Module[{ys = y*y,ymaxs = ymax*ymax,Qp,Q1p,Q1,exp,res(* = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}*)},
+			Qp = ($Qp[y,ys] - $Qp[ymax,ymaxs]);
+			Q1p = $Q1p[y,ys];
+			exp = Exp[Total[c*Qp]];
+			Q1 = Total[c*Q1p];
+			(*Do[res = c[[1]]*(Q1p*exp + Q1*exp*Qp),{11}]*)
+			res = c[[1]]*(Q1p*exp + Q1*exp*Qp);
+			res[[1]] = Q1*exp;
+			res
+	],{{$Qp,_Real,1},{$Q1p,_Real,1}},cpOPTs]];
+
+
+rf$grad2 = With[{cpOPTs = cpOPTs},
 	Compile[{{c,_Real,1}, {y,_Real,1}, {ymax,_Real,1}},
-		Module[{Q,Q1,Q2,Q3,exp},
-			Q = $Q[c[[9;;16]],y] - $Q[c[[9;;16]],ymax];
-			Q1 = $Q1[c[[9;;16]],y];
-			Q2 = $Q2[c[[9;;16]],y];
-			Q3 = $Q3[c[[9;;16]],y];
-			exp = Exp[Q];
-			{Total[c[[1;;8]]*Q1*exp], Total[c[[1;;8]]*Q2*exp], Total[c[[1;;8]]*Q3*exp]}
-	],cpOPTs]]*)
+		Module[{ys = y*y,ymaxs = ymax*ymax,Qp,Q2p,Q2,exp,res(* = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}*)},
+			Qp = ($Qp[y,ys] - $Qp[ymax,ymaxs]);
+			Q2p = $Q2p[y,ys];
+			exp = Exp[Total[c*Qp]];
+			Q2 = Total[c*Q2p];
+			(*Do[res = c[[1]]*(Q1p*exp + Q1*exp*Qp),{11}]*)
+			res = c[[1]]*(Q2p*exp + Q2*exp*Qp);
+			res[[1]] = Q2*exp;
+			res
+	],{{$Qp,_Real,1},{$Q2p,_Real,1}},cpOPTs]];
+
+
+rf$grad3 = With[{cpOPTs = cpOPTs},
+	Compile[{{c,_Real,1}, {y,_Real,1}, {ymax,_Real,1}},
+		Module[{ys = y*y,ymaxs = ymax*ymax,Qp,Q3p,Q3,exp,res(* = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}*)},
+			Qp = ($Qp[y,ys] - $Qp[ymax,ymaxs]);
+			Q3p = $Q3p[y,ys];
+			exp = Exp[Total[c*Qp]];
+			Q3 = Total[c*Q3p];
+			(*Do[res = c[[1]]*(Q1p*exp + Q1*exp*Qp),{11}]*)
+			res = c[[1]]*(Q3p*exp + Q3*exp*Qp);
+			res[[1]] = Q3*exp;
+			res
+	],{{$Qp,_Real,1},{$Q3p,_Real,1}},cpOPTs]];
 
 
 (* ::Subsection:: *)
 (*Jacobian*)
-
-
-jac$gamma = With[{cpOPTs = cpOPTs},
-	Compile[{{c,_Real,1}, {y,_Real,1}, {ymax,_Real,1}},
-		Module[{Q,Q1,Q2,Q3,exp, $c=c[[2;;11]]},
-			Q = $Q[$c,y] - $Q[$c,ymax];
-			Q1 = $Q1[$c,y];
-			Q2 = $Q2[$c,y];
-			Q3 = $Q3[$c,y];
-			exp = Exp[Total[Q]];
-			c[[1]]*{Total[Q1]*exp, Total[Q2]*exp, Total[Q3]*exp}
-	],cpOPTs]]
-
-
-(*rf$grad = With[{cpOPTs = cpOPTs},
-	Compile[{{c,_Real,1}, {y,_Real,1}, {ymax,_Real,1}},
-		Q = $Q[c[[2;;8]],y] - $Q[c[[2;;8]],ymax];
-		Qgrad = $Q$grad[c,y] - $Q$grad[c,y];
-		
-	,cpOPTs]]*)
 
 
 responsefunctions = Compile[{{c,_Real,1}, {F,_Real,1}, {M,_Real,1}, {ymax,_Real,1}},
@@ -425,7 +326,6 @@ obj$W$gamma = With[{cpOPTs = cpOPTs},
 	Compile[{{c,_Real,1}, {ymax,_Real,1},{ydata,_Real,2},{Wdata,_Real,2}},
 		Module[{W,err,sse,size},
 			W = Map[rf$gamma[c,#,ymax]&,ydata];
-			(*W = rf$gamma[c,ydata,ymax];*)
 			err = (W - Wdata);
 			Total[Map[#.#&,Transpose[err]]]
 		]
@@ -437,13 +337,33 @@ objW$c[c_?(VectorQ[#,NumericQ]&),ymax_?(VectorQ[#,NumericQ]&),
 		obj$W$gamma[c,ymax,ydata,Wdata]
 
 
-objW[c_?(VectorQ[#,NumericQ]&),ymax_?(VectorQ[#,NumericQ]&),
-	ydata_?(ArrayQ[#,2,NumericQ]&),Wdata_?(ArrayQ[#,2,NumericQ]&)]:=
-		Block[{W,err},
+grad$W$gamma = With[{cpOPTs = cpOPTs},
+	Compile[{{c,_Real,1}, {ymax,_Real,1},{ydata,_Real,1},{Wdata,_Real,1}},
+		Module[{W,res = c, sigma},
 			W = rf$gamma[c,ydata,ymax];
-			err = (W - Wdata);
-			Total[err *err,2]
+			sigma = (W - Wdata);
+			res = 2.0*(sigma[[1]]*rf$grad1[c,ydata,ymax]+sigma[[2]]*rf$grad2[c,ydata,ymax]+
+			sigma[[3]]*rf$grad3[c,ydata,ymax]);
+			res
 		]
+	,cpOPTs]]
+
+
+cjac$W$gamma = With[{cpOPTs = cpOPTs},
+	Compile[{{c,_Real,1}, {ymax,_Real,1},{ydata,_Real,2},{Wdata,_Real,2}},
+		Table[grad$W$gamma[c,ymax,ydata[[i]],Wdata[[i]]],{i,Length[ydata]}],{{grad$W$gamma,_Real,1}}
+	,cpOPTs]]
+
+
+obj$grad$W = With[{cpOPTs = cpOPTs},
+	Compile[{{c,_Real,1}, {ymax,_Real,1},{ydata,_Real,2},{Wdata,_Real,2}},
+		Total[Table[grad$W$gamma[c,ymax,ydata[[i]],Wdata[[i]]],{i,Length[ydata]}]],{{grad$W$gamma,_Real,1}}
+	,cpOPTs]]
+
+
+grad$W$c[c_?(VectorQ[#,NumericQ]&),ymax_?(VectorQ[#,NumericQ]&),
+	ydata_?(ArrayQ[#,2,NumericQ]&),Wdata_?(ArrayQ[#,2,NumericQ]&)]:=
+		obj$grad$W[c,ymax,ydata,Wdata]
 
 
 (* ::Subsection:: *)
